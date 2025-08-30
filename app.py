@@ -1,22 +1,18 @@
-from fastapi import FastAPI
 import joblib
+from fastapi import FastAPI
 from pydantic import BaseModel
 
-app = FastAPI()
-
-# Load model + vectorizer
+# Load both model and vectorizer
 model = joblib.load("url_model.pkl")
 vectorizer = joblib.load("vectorizer.pkl")
+
+app = FastAPI()
 
 class URLItem(BaseModel):
     url: str
 
-@app.get("/")
-def home():
-    return {"message": "Malicious URL Detection API is running!"}
-
 @app.post("/predict")
-def predict(item: URLItem):
+def predict_url(item: URLItem):
     features = vectorizer.transform([item.url])
     prediction = model.predict(features)[0]
     result = "malicious" if prediction == 1 else "safe"
