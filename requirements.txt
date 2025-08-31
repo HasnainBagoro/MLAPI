@@ -1,0 +1,15 @@
+# Core libraries
+pandas
+numpy
+scikit-learn
+
+# API framework
+fastapi
+uvicorn
+
+# For model persistence
+joblib
+
+# Optional: if your dataset or preprocessing uses regex or text-based features
+tldextract
+python-whois
