@@ -5,7 +5,7 @@ import uvicorn
 app = FastAPI()
 
 # Load trained model
-model = joblib.load("url_model.pkl")
+model = joblib.load("url_model_tldfreq.pkl")
 
 @app.get("/")
 def home():
