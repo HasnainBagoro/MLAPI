@@ -5,7 +5,7 @@ import uvicorn
 app = FastAPI()
 
 # Load trained model
-model = joblib.load("url_model_tldfreq.pkl")
+model = joblib.load("url_model.pkl")
 
 @app.get("/")
 def home():
@@ -13,7 +13,6 @@ def home():
 
 @app.post("/predict")
 def predict_url(url: str):
-    # Example: you can add preprocessing of URL here
     prediction = model.predict([url])[0]
     return {"url": url, "malicious": bool(prediction)}
 
