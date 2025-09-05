@@ -12,14 +12,17 @@ app = FastAPI(title="Malicious URL Detection API")
 
 # Load model at startup
 model = None
+encoder = None
 
 @app.on_event("startup")
 def load_model():
-    global model
+    global model, encoder
     if not os.path.exists(MODEL_PATH):
         raise RuntimeError(f"Model not found at {MODEL_PATH}")
     try:
-        model = joblib.load(MODEL_PATH)
+        bundle = joblib.load(MODEL_PATH)
+        model = bundle["model"]
+        encoder = bundle["encoder"]
     except Exception as e:
         raise RuntimeError(f"Failed to load model: {str(e)}")
 
@@ -33,14 +36,15 @@ def home():
 
 @app.post("/predict")
 def predict_url(item: URLItem):
-    if model is None:
+    if model is None or encoder is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
 
     try:
-        prediction = model.predict([item.url])[0]
+        pred = model.predict([item.url])[0]
+        label = encoder.inverse_transform([pred])[0]
         return {
             "url": item.url,
-            "malicious": bool(prediction)  # 1 → True, 0 → False
+            "prediction": label
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
